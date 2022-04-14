@@ -11,22 +11,23 @@ public class PlayerController : MonoBehaviour
     public Transform transformCamera;
 
     [SerializeField]
+    private float stickToGroundForce = 9.8f;
+
+    [SerializeField]
+    private float verticalVelocity;
+
+    [SerializeField]
     private FloatingJoystick floatingJoystick;
 
-    [SerializeField]
-    private DynamicJoystick dynamicJoystick;
 
-    [SerializeField]
-    private float _moveSpeed;
+    public float speed;
 
-    [SerializeField] 
-    private float _turnSmoothTime = 0.1f;
+    public float rotationSpeed;
 
-    private float _turnSmoothVelocity;
-    
-    
+
     private bool isGround;
-    
+
+    Vector3 movementDirection;
 
     private void Start()
     {
@@ -39,28 +40,38 @@ public class PlayerController : MonoBehaviour
     }
 
     void Update()
-    {
-        isGround = characterController.isGrounded;
-
+    {      
+  
         PlayerRotation();
     }
 
     #region : Player Rotation
     private void PlayerRotation()
     {
-        var direction = new Vector3(dynamicJoystick.Horizontal, 0, dynamicJoystick.Vertical).normalized;
+        float horizontalInput = floatingJoystick.Horizontal;
 
-        if (direction.magnitude > 0.1f)
+        float verticalInput = floatingJoystick.Vertical;
+
+        if (!isGround)
         {
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + transformCamera.eulerAngles.y;
+            verticalVelocity = 0;
+        }
 
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, _turnSmoothTime);
+        verticalVelocity -= stickToGroundForce * Time.deltaTime;
 
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+        movementDirection = new Vector3(horizontalInput, 0, verticalInput);
 
-            Vector3 moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+        movementDirection.y = verticalVelocity;
 
-            characterController.Move(moveDirection.normalized * _moveSpeed * Time.deltaTime); // frame rate independet
+        movementDirection.Normalize();
+
+        characterController.Move(movementDirection * speed * Time.deltaTime);
+
+        if (movementDirection != Vector3.zero)
+        {
+            Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
+
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
         }
     }
     #endregion

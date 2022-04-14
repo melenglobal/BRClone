@@ -6,13 +6,19 @@ using DG.Tweening;
 
 public class StackManager : MonoBehaviour
 {
+    #region : Values
+
     public GameObject player;
 
     public Transform peekPosition;
 
+    public Transform peekPositionRight;
+
     private GameObject prevObj;
 
     public List<GameObject> stackList;
+
+    public List<GameObject> bridgeStairList; 
 
     private PathType stackPathSystem = PathType.CatmullRom;
 
@@ -20,10 +26,12 @@ public class StackManager : MonoBehaviour
 
     Vector3 stackPos;
 
+    #endregion
+
     void Start()
     {
         AddEvents();
-        stackPos = this.transform.position;
+        stackPos = this.transform.localPosition;
 
     }
 
@@ -32,8 +40,8 @@ public class StackManager : MonoBehaviour
         RemoveEvents();
     }
 
-    
-    private void PickUpObjects(object sender, PickUpHandlerEvent e)
+    #region : Stack object
+    private void StackedObject(object sender, PickUpHandlerEvent e)
     {
         stackList.Add(e.PickupObject);
 
@@ -41,30 +49,44 @@ public class StackManager : MonoBehaviour
 
         prevObj.transform.SetParent(this.transform);
 
-        pathVal[0] = peekPosition.localPosition;
+        prevObj.transform.GetComponent<BoxCollider>().enabled = false;
+
+        if (stackList.Count % 2 ==0)
+        {
+            pathVal[0] = peekPositionRight.localPosition;
+        }
+        else
+        {
+            pathVal[0] = peekPosition.localPosition;
+        }
 
         pathVal[1] = stackPos;
 
-        prevObj.transform.DOLocalPath(pathVal, .3f, stackPathSystem).OnComplete(() => stackPos.y = prevObj.transform.localPosition.y + 0.2f);
+        prevObj.transform.DOLocalPath(pathVal, .2f, stackPathSystem).OnComplete(() => {
+            prevObj.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            prevObj.transform.GetComponent<TrailRenderer>().enabled = false;
+            stackPos.y = prevObj.transform.localPosition.y + 0.2f;
+        });
 
         peekPosition.transform.localPosition += new Vector3(0, 0.2f, 0);
 
+    }
+
+    private void BridgeBuilder()
+    {
 
     }
+    #endregion
 
     private void AddEvents()
     {
-        PlayerManager.instance.OnPickupEvent += PickUpObjects;
+        PlayerManager.instance.OnPickupEvent += StackedObject;
     }
 
 
     public void RemoveEvents()
     {
-        PlayerManager.instance.OnPickupEvent -= PickUpObjects;
+        PlayerManager.instance.OnPickupEvent -= StackedObject;
     }
 
-    private void AddToStack(PickUpHandlerEvent e)
-    {
-
-    }
 }

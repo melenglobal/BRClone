@@ -6,6 +6,8 @@ TagManager:
   tags:
   - CinemachineTarget
   - Collectable
+  - PlayerBridge
+  - StairCollider
   layers:
   - Default
   - TransparentFX
