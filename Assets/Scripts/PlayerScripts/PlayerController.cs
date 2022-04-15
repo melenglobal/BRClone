@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    
     public static PlayerController Instance;
 
+    #region Movement Values
     private CharacterController characterController;
-
-    public Transform transformCamera;
 
     [SerializeField]
     private float stickToGroundForce = 9.8f;
@@ -19,15 +19,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private FloatingJoystick floatingJoystick;
 
-
     public float speed;
 
-    public float rotationSpeed;
+    private Vector3 movementDirection;
 
+    private float horizontalInput;
+    
+    private float verticalInput;
 
-    private bool isGround;
-
-    Vector3 movementDirection;
+    #endregion
 
     private void Start()
     {
@@ -39,39 +39,46 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Update()
-    {      
-  
-        PlayerRotation();
+    private void Update()
+    {
+         horizontalInput = floatingJoystick.Horizontal;
+
+         verticalInput = floatingJoystick.Vertical;
+
+        JoystickController();
+    }
+    void FixedUpdate()
+    {
+
+
+        GravityCheck();
+
     }
 
-    #region : Player Rotation
-    private void PlayerRotation()
+    #region : Gravity Check
+    private void GravityCheck()
     {
-        float horizontalInput = floatingJoystick.Horizontal;
-
-        float verticalInput = floatingJoystick.Vertical;
-
-        if (!isGround)
-        {
-            verticalVelocity = 0;
-        }
-
-        verticalVelocity -= stickToGroundForce * Time.deltaTime;
-
-        movementDirection = new Vector3(horizontalInput, 0, verticalInput);
+        verticalVelocity -=stickToGroundForce * Time.deltaTime;
 
         movementDirection.y = verticalVelocity;
 
-        movementDirection.Normalize();
+        characterController.Move(movementDirection * Time.deltaTime);
 
+    }
+    #endregion
+
+    #region : JoystickControl
+    private void JoystickController()
+    {
+        movementDirection = new Vector3(horizontalInput, 0, verticalInput);
+        
         characterController.Move(movementDirection * speed * Time.deltaTime);
 
         if (movementDirection != Vector3.zero)
         {
-            Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
+            Quaternion toRotation = Quaternion.LookRotation(movementDirection);
 
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+            this.transform.rotation = toRotation;
         }
     }
     #endregion

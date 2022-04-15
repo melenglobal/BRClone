@@ -8,6 +8,7 @@ TagManager:
   - Collectable
   - PlayerBridge
   - StairCollider
+  - Platform
   layers:
   - Default
   - TransparentFX

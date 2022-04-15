@@ -6,7 +6,7 @@ using DG.Tweening;
 
 public class StackManager : MonoBehaviour
 {
-    #region : Values
+    #region : Stack Values
 
     public GameObject player;
 
@@ -51,24 +51,24 @@ public class StackManager : MonoBehaviour
 
         prevObj.transform.GetComponent<BoxCollider>().enabled = false;
 
-        if (stackList.Count % 2 ==0)
-        {
-            pathVal[0] = peekPositionRight.localPosition;
-        }
-        else
+        if (stackList.Count % 2 == 0)
         {
             pathVal[0] = peekPosition.localPosition;
         }
 
+        else
+        {
+            pathVal[0] = peekPositionRight.localPosition;    
+        }
+  
+
         pathVal[1] = stackPos;
 
-        prevObj.transform.DOLocalPath(pathVal, .2f, stackPathSystem).OnComplete(() => {
+        prevObj.transform.DOLocalPath(pathVal, 0.2f, stackPathSystem).OnComplete(() => {
             prevObj.transform.localRotation = Quaternion.Euler(Vector3.zero);
             prevObj.transform.GetComponent<TrailRenderer>().enabled = false;
             stackPos.y = prevObj.transform.localPosition.y + 0.2f;
         });
-
-        peekPosition.transform.localPosition += new Vector3(0, 0.2f, 0);
 
     }
 
@@ -78,6 +78,7 @@ public class StackManager : MonoBehaviour
     }
     #endregion
 
+    #region Event Listeners
     private void AddEvents()
     {
         PlayerManager.instance.OnPickupEvent += StackedObject;
@@ -88,5 +89,6 @@ public class StackManager : MonoBehaviour
     {
         PlayerManager.instance.OnPickupEvent -= StackedObject;
     }
+    #endregion
 
 }

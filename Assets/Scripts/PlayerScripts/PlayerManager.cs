@@ -17,23 +17,23 @@ public class PlayerManager: MonoBehaviour
     {
         instance = this;
     }
-    private void OnControllerColliderHit(ControllerColliderHit hit)
+    private void OnTriggerEnter(Collider other)
     {
-        if (hit.gameObject.CompareTag("Collectable"))
+        if (other.gameObject.CompareTag("Collectable"))
         {
             var pickupObjectEventData = new PickUpHandlerEvent
             {
-                PickupObject = hit.gameObject,
+                PickupObject = other.gameObject,
             };
 
             OnPickupEvent?.Invoke(this, pickupObjectEventData);
         }
 
-        if (hit.gameObject.CompareTag("StairCollider"))
+        if (other.gameObject.CompareTag("StairCollider"))
         {
             var droppedObjectEventData = new DropHandlerEvent
             {
-                DroppedObject = hit.gameObject,
+                DroppedObject = other.gameObject,
             };
         }
     }
