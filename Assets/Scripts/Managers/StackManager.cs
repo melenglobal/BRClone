@@ -60,7 +60,6 @@ public class StackManager : MonoBehaviour
         {
             pathVal[0] = peekPositionRight.localPosition;    
         }
-  
 
         pathVal[1] = stackPos;
 
@@ -69,9 +68,7 @@ public class StackManager : MonoBehaviour
             prevObj.transform.GetComponent<TrailRenderer>().enabled = false;
             stackPos.y = prevObj.transform.localPosition.y + 0.2f;
         });
-
     }
-
     private void BridgeBuilder()
     {
 
@@ -83,8 +80,6 @@ public class StackManager : MonoBehaviour
     {
         PlayerManager.instance.OnPickupEvent += StackedObject;
     }
-
-
     public void RemoveEvents()
     {
         PlayerManager.instance.OnPickupEvent -= StackedObject;
